@@ -1,0 +1,4 @@
+- source: presentation.qmd
+  quarto-pub:
+    - id: 05c396f6-7887-437b-968e-0a794ed63d44
+      url: 'https://quartopub.com/sites/melanie-inky/reinforcement-learning-is-fun'

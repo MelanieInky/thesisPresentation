@@ -1,0 +1,359 @@
+---
+title: "Reinforcement learning is fun"
+format:
+  revealjs:
+    theme: white
+    chalkboard:
+        theme: whiteboard
+---
+
+
+## Intro
+
+
+
+## Motivation behind the thesis - Pseudo time iterations
+
+- We want to solve a linear system $Au = b$ 
+- We consider instead the initial value problem $u'(t) = Au(t)-b$. 
+- In steady state $u' = 0 \iff Au-b = 0$
+- Any consistent numerical solver for this problem converges to the steady state.
+
+
+## Convection diffusion equation
+
+- $u_{xx} = bu_x + 1$, $u(0) = u(1) = 0$.
+- Use finite difference, with $n$ interior nodes to get a linear system of the form $Mu = e$. 
+- Two *problem parameters*, $b$ and $n$.
+- Use an explicit Runge-Kutta solver with one time step parameter $\Delta t$, one other parameter $\alpha$. 
+- How can we choose the best *solver parameters* depending on the *problem parameters*. 
+
+## Machine learning
+
+Machine learning
+
+## The three main types of machine learning
+
+- Supervised learning. From input $X$, predict output $Y$.
+
+![](images/cat.jpg){width='150'}
+
+Label: cat.
+
+:::{.footer}
+Cat picture credit:© Marie-Lan Nguyen
+:::
+
+
+## The three main types of machine learning
+- <span style="opacity: 0.5">Supervised learning. From input $X$, predict output $Y$.</span>
+- Unsupervised learning. Use only input $X$ and reveal informations about it.
+
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(patchwork)
+
+data(iris)
+
+p1 <- iris %>% ggplot(aes(Sepal.Length, Sepal.Width)) +
+    geom_point(size = 4) +
+    theme_classic() +
+    theme(text = element_text(size = 18))
+
+iris_for_cluster <- iris %>% select(-c(Species))
+
+set.seed(123445)
+my_clusters <- kmeans(iris_for_cluster, centers = 3)
+
+iris2 <- tibble(cbind(iris, cluster = as.factor(my_clusters$cluster)))
+
+p2 <- iris2  %>%
+    ggplot(aes(x = Sepal.Length, y = Sepal.Width, colour = cluster)) +
+        geom_point(size = 4) +
+        theme_classic() +
+        theme(text = element_text(size = 18)) +
+        scale_color_brewer(palette = "Dark2")
+
+p1 + p2
+
+
+```
+
+:::{.footer}
+An example of k-mean clustering on the Iris dataset, with poor performances. 
+:::
+
+
+## The three main types of machine learning
+- <span style="opacity: 0.5">Supervised learning. From input $X$, predict output $Y$.
+- <span style="opacity: 0.5">Unsupervised learning. Use only input $X$ and reveal informations about it.</span>
+- Reinforcement learning. Make decisions and maximize rewards. 
+
+
+
+
+## What is reinforcement learning
+
+
+
+
+:::{.fragment}
+- In reinforcement learning, an agent interact with its environment, makes a decision and receive rewards. 
+:::
+
+
+:::{.fragment}
+![](images/Pac-man.png)
+:::
+
+
+
+
+## Markov decision process
+
+
+
+:::: {.columns}
+:::{.column width="60%"}
+- A state set $\mathcal{S}$.
+- An action set $\mathcal{A}$.
+- A reward set $\mathcal{R}$.
+- A policy $\pi(a|s)$.
+- A model $p(s',r|s,a)$.
+
+:::
+
+:::{.column width="40%"}
+![](images/MDP.png)
+:::
+
+::::
+
+
+The model has the Markov property. The state and rewards transition probabilities only depend on the current state, and not the states before. 
+
+
+
+## An adorable example - game rules
+
+
+:::: {.columns}
+
+::: {.column width="40%"}
+![](images/gridworldJazz.png)
+:::
+
+::: {.column width="60%" .incremental .smaller}
+- Jazz the jackrabbit wants to get to the carrot as fast as possible.
+- He can move in any 4 directions, but not diagonally, we call it an action.
+- The red boxes are difficult to get into, so he wants to avoid them if possible.
+:::
+
+
+::::
+
+:::{.footer}
+Example adapted from *Mathematical foundations of reinforcement learning* by Shiyu Zhao.
+:::
+
+## An adorable example - States and actions {.smaller}
+
+
+
+:::: {.columns}
+
+::: {.column width="40%"}
+![](images/gridworldJazz.png)
+:::
+
+::: {.column width="60%" .incremental}
+- We will keep track of Jazz positions over time with his state. 
+- Starting state $S_0=1$. Subsequent states $S_1,S_2,\dots$. 
+- We also keep track of his actions $A_0, A_1, A_2, \dots$.
+- After each action, he ends up in a new state.
+- When he ends up on the box with the carrot at a time $\tau$, we stop the process and we call $S_\tau = 9$ the terminal state.
+:::
+
+
+::::
+
+
+
+## An adorable example - Actions and policy
+
+:::: {.columns}
+
+::: {.column width="40%"}
+![](images/gridworldJazz.png)
+:::
+
+::: {.column width="60%" .incremental .smaller}
+- How to decide which action to make at which state? We need to define a policy.
+- A policy defines which action Jazz should take, given his current state. Defined as a the conditional probability $\Pr(A_t=a| S_t = s) = \pi(a|s)$.
+:::
+
+::::
+
+## An adorable example - State transitions {.smaller}
+
+
+![](images/state_transition.png)
+
+:::{.incremental}
+- In this example, at time $t$, Jazz' state is $S_t=4$.
+- He looks at his policy $\pi(a|s=4)$, which tells him to go right with probability 1. 
+- He takes the action $A_t=\text{right}$, and Jazz finds himself in a new state $S_{t+1} = 5$.
+- This is called a state transition.
+:::
+
+## An adorable example - Rewards
+
+
+:::: {.columns}
+
+::: {.column width="40%"}
+![](images/rewardJazz.png)
+:::
+
+::: {.column width="60%" .incremental .smaller}
+- Depending on his state $S_t$ and the chosen action $A_t$ Jazz gets a reward $R_{t+1}$.
+- Rewards can be stochastics as well. 
+
+:::
+
+::::
+
+
+## Stochastic states and rewards transition {.smaller}
+
+
+:::{.fragment}
+:::: {.columns}
+
+::: {.column width="35%"}
+![](images/bunny_teleporter.png)
+:::
+
+::: {.column width="65%" .incremental .smaller}
+- There is now a teleporter in the 4th box. 
+- $\Pr(S_{t+1} = 9, R_{t+1} = 5,  | S_t = 1, A_t = \text{"down"}) = 0.5$.
+- $\Pr(S_{t+1} = 7,  R_{t+1} = -1| S_t = 1, A_t = \text{"down"}) = 0.5$.
+- More generally, we denote this by $p(r,s'|a,s)$.
+- Is going down a good decision from this state?
+:::
+
+::::
+:::
+
+:::{.fragment}
+This is what we will call the model. Can be difficult to know in advance. Imagine for example if the teleporter chances are unknown.
+:::
+
+
+## An adorable example - Trajectory {.smaller}
+
+:::{.fragment}
+:::: {.columns}
+
+::: {.column width="40%"}
+![](images/gridworldJazz.png)
+:::
+
+::: {.column width="60%" .incremental .smaller}
+- A trajectory is the chain of states, actions and rewards $S_0, A_0 \to S_1, A_1, R_1 \to \dots \to S_\tau ,A_\tau , R_\tau$.
+- A return is then $G_0 = R_1 + \gamma R_2 + \gamma^2 R_3 + \dots + \gamma^{\tau-1} R_\tau$ where $\gamma$ is called the discount rate.
+- The discount rate is between 0 and 1, and indicates how we should value long term rewards vs short term rewards.
+:::
+
+::::
+:::
+
+:::{.fragment}
+Jazz's goal is to find a policy that maximizes his return.
+:::
+
+## State values {.smaller}
+
+
+- We need a measurement of how valuable being in a specific state is, given a policy. 
+- Starting from a state $S_t$, what is the expected return?
+- The state value of a state $s$ is defined as 
+
+$$
+v_\pi(s) = E[G_t|S_t = s] = E[R_{t+1} + \gamma R_{t+2} + \dots | S_t = s]
+$$
+
+:::{.fragment}
+![](images/tictactoe.png){width="400"}
+
+It is circle player turn, which state is the most valuable, left of right?
+:::
+
+
+## The Bellman's equation {.smaller .incremental}
+
+:::{.fragment}
+A recursive equation between the state values
+
+\begin{align}
+v_\pi(s) &= \sum_{a\in\mathcal{A}, r\in\mathcal{R} , s\in\mathcal{S}}\pi(a|s)p(s',r|s,a)(r+\gamma v_\pi(s'))\\
+&= \sum_{a\in\mathcal{A}}\pi(a|s)\sum_{r\in\mathcal{R} , s\in\mathcal{S}}p(s',r|s,a)(r+\gamma v_\pi(s'))\\
+&= \sum_{a\in\mathcal{A}}\pi(a|s)q_\pi(a,s)
+\end{align}
+
+$q_\pi(a,s)$ is called the action value. Here is the idea:
+:::
+
+:::{.fragment .incremental}
+- Compute, with the foremost expression, the state values for a given policy.
+- Then compute the action values $q_\pi(a,s)$.
+- Chose a new policy so that we chose the action with the highest value with probability 1. 
+:::
+
+:::{.fragment}
+This is called policy iteration.
+:::
+
+
+## Let's do a step together
+
+Initial policy is to chose an action among possible actions randomly, and uniformly. 
+The state values are here.
+What should be the new policy. 
+
+
+## Test
+
+::: {.fragment fragment-index=4 .fade-out}
+::: {.fragment fragment-index=2}
+Appears last
+:::
+:::
+
+::: {.fragment fragment-index=1}
+Appears first
+:::
+
+::: {.fragment fragment-index=3}
+Appears second
+:::
+
+## Policy gradient
+
+- Using policy gradient 
+
+
+## Results
+
+
+## What we have
+
+- A linear system $Ax = b$
+- 
+
+## Going to sleep
+
+- Get in bed
+- Count sheep
