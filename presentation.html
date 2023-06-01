@@ -9,7 +9,7 @@
 <link href="presentation_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.2.335">
 
-  <title>Reinforcement learning is fun</title>
+  <title>Reinforcement Learning for the Optimization of Explicit Runge Kutta Method Parameters</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
@@ -325,37 +325,20 @@
     <div class="slides">
 
 <section id="title-slide" class="quarto-title-block center">
-  <h1 class="title">Reinforcement learning is fun</h1>
+  <h1 class="title">Reinforcement Learning for the Optimization of Explicit Runge Kutta Method Parameters</h1>
 
 <div class="quarto-title-authors">
 </div>
 
 </section>
-<section id="intro" class="slide level2">
-<h2>Intro</h2>
-</section>
-<section id="motivation-behind-the-thesis---pseudo-time-iterations" class="slide level2">
-<h2>Motivation behind the thesis - Pseudo time iterations</h2>
+<section id="introduction-and-plan" class="slide level2">
+<h2>Introduction and plan</h2>
 <ul>
-<li>We want to solve a linear system <span class="math inline">\(Au = b\)</span></li>
-<li>We consider instead the initial value problem <span class="math inline">\(u'(t) = Au(t)-b\)</span>.</li>
-<li>In steady state <span class="math inline">\(u' = 0 \iff Au-b = 0\)</span></li>
-<li>Any consistent numerical solver for this problem converges to the steady state.</li>
+<li>This bachelor thesis had a lot of small parts pieced together.</li>
+<li>The goal is to use machine learning in a mathematical setting and discover what is possible to do with it.</li>
+<li>Focus of this presentation on Reinforcement Learning.</li>
+<li>Then talk about a test problem for which RL was used.</li>
 </ul>
-</section>
-<section id="convection-diffusion-equation" class="slide level2">
-<h2>Convection diffusion equation</h2>
-<ul>
-<li><span class="math inline">\(u_{xx} = bu_x + 1\)</span>, <span class="math inline">\(u(0) = u(1) = 0\)</span>.</li>
-<li>Use finite difference, with <span class="math inline">\(n\)</span> interior nodes to get a linear system of the form <span class="math inline">\(Mu = e\)</span>.</li>
-<li>Two <em>problem parameters</em>, <span class="math inline">\(b\)</span> and <span class="math inline">\(n\)</span>.</li>
-<li>Use an explicit Runge-Kutta solver with one time step parameter <span class="math inline">\(\Delta t\)</span>, one other parameter <span class="math inline">\(\alpha\)</span>.</li>
-<li>How can we choose the best <em>solver parameters</em> depending on the <em>problem parameters</em>.</li>
-</ul>
-</section>
-<section id="machine-learning" class="slide level2">
-<h2>Machine learning</h2>
-<p>Machine learning is broadly defined as how to</p>
 </section>
 <section id="the-three-main-types-of-machine-learning" class="slide level2">
 <h2>The three main types of machine learning</h2>
@@ -363,57 +346,60 @@
 <li>Supervised learning. From input <span class="math inline">\(X\)</span>, predict output <span class="math inline">\(Y\)</span>.</li>
 </ul>
 
-<img data-src="images/cat.jpg" width="150" class="r-stretch"><p>Label: cat.</p>
+<img data-src="images/cat.jpg" width="130" class="r-stretch"><p>Label: cat.</p>
 <div class="footer">
-<p>Cat picture credit:© Marie-Lan Nguyen</p>
+<p>Cat picture credit:© Marie-Lan Nguyen. Definitions adapted from <em>An introduction to statistical learning</em> by Gareth James, Daniela Witten, Trevor Hastie, Rob Tibshirani.</p>
 </div>
 </section>
 <section id="the-three-main-types-of-machine-learning-1" class="slide level2">
 <h2>The three main types of machine learning</h2>
 <ul>
 <li><span style="opacity: 0.5">Supervised learning. From input <span class="math inline">\(X\)</span>, predict output <span class="math inline">\(Y\)</span>.</span></li>
-<li>Unsupervised learning. Use only input <span class="math inline">\(X\)</span> and reveal informations about it.</li>
+<li>Unsupervised learning. We only have an input <span class="math inline">\(X\)</span> and reveal informations about it.</li>
 </ul>
 
 <img data-src="presentation_files/figure-revealjs/unnamed-chunk-1-1.png" width="960" class="r-stretch"><div class="footer">
-<p>An example of k-mean clustering on the Iris dataset, with poor performances.</p>
+<p>An example of k-mean clustering on the Iris dataset.</p>
 </div>
 </section>
 <section id="the-three-main-types-of-machine-learning-2" class="slide level2">
 <h2>The three main types of machine learning</h2>
 <ul>
 <li><span style="opacity: 0.5">Supervised learning. From input <span class="math inline">\(X\)</span>, predict output <span class="math inline">\(Y\)</span>.</span></li>
-<li><span style="opacity: 0.5">Unsupervised learning. Use only input <span class="math inline">\(X\)</span> and reveal informations about it.</span></li>
-<li>Reinforcement learning. Make decisions and maximize rewards.</li>
+<li><span style="opacity: 0.5">Unsupervised learning. We only have an input <span class="math inline">\(X\)</span> and reveal informations about it.</span></li>
+<li>Reinforcement learning. Make decisions and maximize a reward function.</li>
 </ul>
 </section>
 <section id="what-is-reinforcement-learning" class="slide level2">
 <h2>What is reinforcement learning</h2>
-<div class="fragment">
-<ul>
-<li>In reinforcement learning, an agent interact with its environment, makes a decision and receive rewards.</li>
-</ul>
-</div>
-<div class="fragment">
-<p><img data-src="images/Pac-man.png"></p>
-</div>
-</section>
-<section id="markov-decision-process" class="slide level2">
-<h2>Markov decision process</h2>
+<p>In reinforcement learning, an agent interacts with its environment, makes decisions and receives rewards.</p>
 <div class="columns">
 <div class="column" style="width:60%;">
+<p><img data-src="images/Pac-man.png"></p>
+</div><div class="column" style="width:40%;">
+<p><img data-src="images/Reinforcement_learning_diagram.svg.png"></p>
+</div>
+</div>
+<div class="footer">
+<p>Pac-man screenshot. Diagram via wikipedia.</p>
+</div>
+</section>
+<section id="markov-decision-process" class="slide level2 smaller">
+<h2>Markov decision process</h2>
+<p>A discrete-time stochastic process with:</p>
 <ul>
 <li>A state set <span class="math inline">\(\mathcal{S}\)</span>.</li>
 <li>An action set <span class="math inline">\(\mathcal{A}\)</span>.</li>
 <li>A reward set <span class="math inline">\(\mathcal{R}\)</span>.</li>
 <li>A policy <span class="math inline">\(\pi(a|s)\)</span>.</li>
-<li>A model <span class="math inline">\(p(s',r|s,a)\)</span>.</li>
+<li>A model <span class="math inline">\(p(s',r|s,a) = \Pr(S_{t+1} = s', R_{t+1} = r| S_t = s, A_t = a)\)</span>.</li>
 </ul>
-</div><div class="column" style="width:40%;">
-<p><img data-src="images/MDP.png"></p>
+<p>The model has the Markov property. The states and rewards transition probabilities only depend on the current state, and not the states before.</p>
+<p>In other words, the environment is memoryless.</p>
+<p><img data-src="images/Reinforcement_learning_diagram.svg.png" class="absolute" style="top: 50px; right: 30px; width: 350px; "></p>
+<div class="footer">
+<p>Diagram via wikipedia.</p>
 </div>
-</div>
-<p>The model has the Markov property. The state and rewards transition probabilities only depend on the current state, and not the states before.</p>
 </section>
 <section id="an-adorable-example---game-rules" class="slide level2">
 <h2>An adorable example - game rules</h2>
@@ -423,7 +409,7 @@
 </div><div class="column smaller" style="width:60%;">
 <ul>
 <li class="fragment">Jazz the jackrabbit wants to get to the carrot as fast as possible.</li>
-<li class="fragment">He can move in any 4 directions, but not diagonally, we call it an action.</li>
+<li class="fragment">He can move either vertically or horizontally, but not diagonally.</li>
 <li class="fragment">The red boxes are difficult to get into, so he wants to avoid them if possible.</li>
 </ul>
 </div>
@@ -439,10 +425,10 @@
 <p><img data-src="images/gridworldJazz.png"></p>
 </div><div class="column" style="width:60%;">
 <ul>
-<li class="fragment">We will keep track of Jazz positions over time with his state.</li>
+<li class="fragment">We will keep track of Jazz’ position over time with his state.</li>
 <li class="fragment">Starting state <span class="math inline">\(S_0=1\)</span>. Subsequent states <span class="math inline">\(S_1,S_2,\dots\)</span>.</li>
-<li class="fragment">We also keep track of his actions <span class="math inline">\(A_0, A_1, A_2, \dots\)</span>.</li>
-<li class="fragment">After each action, he ends up in a new state.</li>
+<li class="fragment">Any time he moves is an action. We keep track of his actions <span class="math inline">\(A_0, A_1, A_2, \dots\)</span>.</li>
+<li class="fragment">After each action, he finds himself in a new state. This is called a state transition.</li>
 <li class="fragment">When he ends up on the box with the carrot at a time <span class="math inline">\(\tau\)</span>, we stop the process and we call <span class="math inline">\(S_\tau = 9\)</span> the terminal state.</li>
 </ul>
 </div>
@@ -456,21 +442,9 @@
 </div><div class="column smaller" style="width:60%;">
 <ul>
 <li class="fragment">How to decide which action to make at which state? We need to define a policy.</li>
-<li class="fragment">A policy defines which action Jazz should take, given his current state. Defined as a the conditional probability <span class="math inline">\(\Pr(A_t=a| S_t = s) = \pi(a|s)\)</span>.</li>
+<li class="fragment">A policy defines which action Jazz should make, given his current state. Defined as a the conditional probability <span class="math inline">\(\Pr(A_t=a| S_t = s) = \pi(a|s)\)</span>.</li>
 </ul>
 </div>
-</div>
-</section>
-<section id="an-adorable-example---state-transitions" class="slide level2 smaller">
-<h2>An adorable example - State transitions</h2>
-
-<img data-src="images/state_transition.png" class="r-stretch"><div>
-<ul>
-<li class="fragment">In this example, at time <span class="math inline">\(t\)</span>, Jazz’ state is <span class="math inline">\(S_t=4\)</span>.</li>
-<li class="fragment">He looks at his policy <span class="math inline">\(\pi(a|s=4)\)</span>, which tells him to go right with probability 1.</li>
-<li class="fragment">He takes the action <span class="math inline">\(A_t=\text{right}\)</span>, and Jazz finds himself in a new state <span class="math inline">\(S_{t+1} = 5\)</span>.</li>
-<li class="fragment">This is called a state transition.</li>
-</ul>
 </div>
 </section>
 <section id="an-adorable-example---rewards" class="slide level2">
@@ -480,19 +454,206 @@
 <p><img data-src="images/rewardJazz.png"></p>
 </div><div class="column smaller" style="width:60%;">
 <ul>
+<li class="fragment">Rewards should be designed to encourage getting to the carrot as fast as possible, and to avoid red boxes.<br>
+</li>
 <li class="fragment">Depending on his state <span class="math inline">\(S_t\)</span> and the chosen action <span class="math inline">\(A_t\)</span> Jazz gets a reward <span class="math inline">\(R_{t+1}\)</span>.</li>
-<li class="fragment">Rewards can be stochastics as well.</li>
 </ul>
 </div>
+</div>
+</section>
+<section id="an-adorable-example---trajectory" class="slide level2 smaller">
+<h2>An adorable example - Trajectory</h2>
+<div class="columns">
+<div class="column" style="width:40%;">
+<p><img data-src="images/gridworldJazz.png"></p>
+</div><div class="column smaller" style="width:60%;">
+<ul>
+<li class="fragment">A trajectory is the chain of states, actions and rewards <span class="math inline">\(S_0, A_0 \to S_1, A_1, R_1 \to \dots \to S_\tau ,A_\tau , R_\tau\)</span>.</li>
+<li class="fragment">A return is then <span class="math inline">\(G_0 = R_1 + \gamma R_2 + \gamma^2 R_3 + \dots + \gamma^{\tau-1} R_\tau\)</span> where <span class="math inline">\(\gamma\)</span> is called the discount rate.</li>
+<li class="fragment">The discount rate is between 0 and 1, and is there to balance long term vs short term rewards.</li>
+</ul>
+</div>
+</div>
+<div class="fragment">
+<p>Jazz’s goal is to find a policy that maximizes the return he gets.</p>
+</div>
+</section>
+<section id="state-values" class="slide level2 smaller">
+<h2>State values</h2>
+<ul>
+<li>We need a criterion for how valuable being in a specific state is, given a policy.</li>
+<li>Starting from a state <span class="math inline">\(S_t\)</span>, what is the expected return?</li>
+<li>The state value of a state <span class="math inline">\(s\)</span> is defined as</li>
+</ul>
+<p><span class="math display">\[
+v_\pi(s) = E[G_t|S_t = s] = E[R_{t+1} + \gamma R_{t+2} + \dots | S_t = s]
+\]</span></p>
+<div class="fragment">
+<p><img data-src="images/tictactoe.png" width="400"></p>
+<p>It is circle player turn, which state is the most valuable, left of right?</p>
+</div>
+<div class="fragment">
+<p>It depends on the policy. If the policy is good then left state is more valuable.</p>
+</div>
+</section>
+<section id="the-bellman-equation" class="slide level2 smaller incremental">
+<h2>The Bellman equation</h2>
+<div class="fragment">
+<p><span class="math display">\[\begin{align}
+v_\pi(s) &amp;= \sum_{a\in\mathcal{A}, r\in\mathcal{R} , s\in\mathcal{S}}\pi(a|s)p(s',r|s,a)(r+\gamma v_\pi(s'))\\
+&amp;= \sum_{a\in\mathcal{A}}\pi(a|s)\sum_{r\in\mathcal{R} , s\in\mathcal{S}}p(s',r|s,a)(r+\gamma v_\pi(s'))\\
+&amp;= \sum_{a\in\mathcal{A}}\pi(a|s)q_\pi(a,s)
+\end{align}\]</span></p>
+<p><span class="math inline">\(q_\pi(a,s)\)</span> is called the action value. Idea:</p>
+</div>
+<div class="fragment">
+<ol type="1">
+<li class="fragment">Compute, with the foremost expression, the state values for a given policy.</li>
+<li class="fragment">Then compute the action values <span class="math inline">\(q_\pi(a,s)\)</span>.</li>
+<li class="fragment">Chose a new policy so that we chose the best action.</li>
+</ol>
+</div>
+<div class="fragment">
+<p>This is called policy iteration.</p>
+</div>
+<div class="footer">
+<p>The general idea is called <em>generalized policy iteration</em> in <em>Reinforcement learning - An introduction</em> by Richard S. Sutton and Andrew G. Barto.</p>
+</div>
+</section>
+<section id="motivation-behind-the-thesis---pseudo-time-iterations" class="slide level2">
+<h2>Motivation behind the thesis - Pseudo time iterations</h2>
+<ul>
+<li>We want to solve a linear system <span class="math inline">\(Au = b\)</span></li>
+<li>We consider instead the initial value problem <span class="math inline">\(u'(t) = Au(t)-b\)</span>.</li>
+<li>In steady state <span class="math inline">\(u' = 0 \iff Au-b = 0\)</span></li>
+<li>Any consistent numerical solver for this problem converges to the steady state.</li>
+</ul>
+</section>
+<section id="convection-diffusion-equation" class="slide level2 smaller">
+<h2>Convection diffusion equation</h2>
+<div>
+<ul>
+<li class="fragment"><span class="math inline">\(u_{xx} = bu_x + 1\)</span>, <span class="math inline">\(u(0) = u(1) = 0\)</span>.</li>
+<li class="fragment">Use finite difference, with <span class="math inline">\(n\)</span> interior nodes to get a linear system of the form <span class="math inline">\(Mu = e\)</span>.</li>
+<li class="fragment">Solve the linear system by solving the IVP <span class="math inline">\(u' = e - Mu\)</span>.</li>
+<li class="fragment">Two <em>problem parameters</em>, <span class="math inline">\(b\)</span> and <span class="math inline">\(n\)</span>.</li>
+<li class="fragment">Use an explicit Runge-Kutta solver with one time step parameter <span class="math inline">\(\Delta t\)</span>, one other parameter <span class="math inline">\(\alpha\)</span>.</li>
+<li class="fragment">How to choose the best <em>solver parameters</em> depending on the <em>problem parameters</em>?</li>
+</ul>
+</div>
+</section>
+<section id="making-the-test-problem-a-reinforcement-learning-problem" class="slide level2 smaller">
+<h2>Making the test problem a reinforcement learning problem</h2>
+<div>
+<ul>
+<li class="fragment">Two <em>problem parameters</em> <span class="math inline">\(b\)</span> and <span class="math inline">\(n\)</span>. We model this as a state.</li>
+<li class="fragment">An action is choosing a set of <em>solver parameters</em> <span class="math inline">\(\alpha\)</span> and <span class="math inline">\(\Delta t\)</span>.</li>
+<li class="fragment">State transitions are random, choose a new <span class="math inline">\(b\)</span> and <span class="math inline">\(n\)</span> after taking an action.<br>
+</li>
+<li class="fragment">Then, we choose the policy to be of the form</li>
+</ul>
+</div>
+<div class="fragment">
+<p><span class="math display">\[
+\begin{pmatrix}
+\alpha \\
+\Delta t
+\end{pmatrix} =
+\begin{pmatrix}
+\theta_0 &amp; \theta_1\\
+\theta_2 &amp; \theta_3
+\end{pmatrix}
+\begin{pmatrix}
+b\\
+n
+\end{pmatrix} +
+\begin{pmatrix}
+\theta_4\\
+\theta_5
+\end{pmatrix}.
+\]</span></p>
+<p>Goal: find the best possible values for the <span class="math inline">\(\theta_i\)</span>. We need to define a reward to maximize!</p>
+</div>
+</section>
+<section id="reward" class="slide level2 smaller">
+<h2>Reward</h2>
+<div>
+<ul>
+<li class="fragment">Once both the state (<span class="math inline">\(b\)</span> and <span class="math inline">\(n\)</span>) and the action (<span class="math inline">\(\Delta t\)</span> and <span class="math inline">\(\alpha\)</span>) are chosen, we need to compute a reward.</li>
+<li class="fragment">Ideally, rewards should be dependent on convergence rate of the solver, but this is computationally expensive to do.</li>
+<li class="fragment">Define the residual after <span class="math inline">\(k\)</span> iterations as <span class="math inline">\(r_k = ||Mu^{k} - e||\)</span>. Then define the residual ratio</li>
+</ul>
+</div>
+<div class="fragment">
+<p><span class="math display">\[
+\rho_k = \frac{r_k}{r_{k-1}} = \frac{||Mu^{k} - e||}{||Mu^{k-1} - e||}.
+\]</span></p>
+<p>Then the reward can be <span class="math inline">\(r = 1-\rho_{10}\)</span>.</p>
+</div>
+</section>
+<section id="results" class="slide level2 smaller">
+<h2>Results</h2>
+<p><span class="math display">\[
+\begin{pmatrix}
+\alpha \\
+\Delta t
+\end{pmatrix} =
+\begin{pmatrix}
+\theta_0 &amp; \theta_1\\
+\theta_2 &amp; \theta_3
+\end{pmatrix}
+\begin{pmatrix}
+b\\
+n
+\end{pmatrix} +
+\begin{pmatrix}
+\theta_4\\
+\theta_5
+\end{pmatrix}.
+\]</span> Initial value for <span class="math inline">\(\theta\)</span> was chosen as <span class="math inline">\(\theta_4 = 0.3\)</span>, <span class="math inline">\(\theta_5 = 2\)</span>. Rest to <span class="math inline">\(0\)</span>. Evolution of the parameters:</p>
+
+<img data-src="images/theta_evol.png" class="r-stretch"></section>
+<section id="before-and-after-training" class="slide level2">
+<h2>Before and after training</h2>
+<p><img data-src="images/initial_policy_10.png" class="absolute" style="left: 10px; width: 500px; "></p>
+<p><img data-src="images/learned_policy_10.png" class="absolute" style="top: 70px; left: 510px; width: 500px; "></p>
+</section>
+<section id="conclusion" class="slide level2">
+<h2>Conclusion</h2>
+<ul>
+<li>A use of machine learning in a numerical analysis setting.</li>
+<li>Reinforcement learning can be used.</li>
+<li>Could be extended to choosing which solver to use, and for more equations.</li>
+</ul>
+</section>
+<section id="bonus-slides" class="slide level2">
+<h2>Bonus slides</h2>
+</section>
+<section id="machine-learning" class="slide level2">
+<h2>Machine learning</h2>
+<p>“Machine learning (ML) is a field devoted to understanding and building methods that let machines "learn” – that is, methods that leverage data to improve computer performance on some set of tasks.”</p>
+<div class="footer">
+<p>Via wikipedia, which cites <em>Machine learning</em> (1997) by Mitchel, Tom.</p>
+</div>
+</section>
+<section id="an-adorable-example---example" class="slide level2 smaller">
+<h2>An adorable example - Example</h2>
+
+<img data-src="images/state_transition.png" class="r-stretch"><div>
+<ul>
+<li class="fragment">In this example, at time <span class="math inline">\(t\)</span>, Jazz’ state is <span class="math inline">\(S_t=4\)</span>.</li>
+<li class="fragment">He looks at his policy <span class="math inline">\(\pi(a|s=4)\)</span>, which tells him to go right with probability 1.</li>
+<li class="fragment">He takes the action <span class="math inline">\(A_t=\text{right}\)</span>, and Jazz finds himself in a new state <span class="math inline">\(S_{t+1} = 5\)</span>.</li>
+</ul>
 </div>
 </section>
 <section id="stochastic-states-and-rewards-transition" class="slide level2 smaller">
 <h2>Stochastic states and rewards transition</h2>
 <div class="fragment">
 <div class="columns">
-<div class="column" style="width:35%;">
+<div class="column" style="width:30%;">
 <p><img data-src="images/bunny_teleporter.png"></p>
-</div><div class="column smaller" style="width:65%;">
+</div><div class="column smaller" style="width:70%;">
 <ul>
 <li class="fragment">There is now a teleporter in the 4th box.</li>
 <li class="fragment"><span class="math inline">\(\Pr(S_{t+1} = 9, R_{t+1} = 5, | S_t = 1, A_t = \text{"down"}) = 0.5\)</span>.</li>
@@ -506,103 +667,6 @@
 <div class="fragment">
 <p>This is what we will call the model. Can be difficult to know in advance. Imagine for example if the teleporter chances are unknown.</p>
 </div>
-</section>
-<section id="an-adorable-example---trajectory" class="slide level2 smaller">
-<h2>An adorable example - Trajectory</h2>
-<div class="fragment">
-<div class="columns">
-<div class="column" style="width:40%;">
-<p><img data-src="images/gridworldJazz.png"></p>
-</div><div class="column smaller" style="width:60%;">
-<ul>
-<li class="fragment">A trajectory is the chain of states, actions and rewards <span class="math inline">\(S_0, A_0 \to S_1, A_1, R_1 \to \dots \to S_\tau ,A_\tau , R_\tau\)</span>.</li>
-<li class="fragment">A return is then <span class="math inline">\(G_0 = R_1 + \gamma R_2 + \gamma^2 R_3 + \dots + \gamma^{\tau-1} R_\tau\)</span> where <span class="math inline">\(\gamma\)</span> is called the discount rate.</li>
-<li class="fragment">The discount rate is between 0 and 1, and indicates how we should value long term rewards vs short term rewards.</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="fragment">
-<p>Jazz’s goal is to find a policy that maximizes his return.</p>
-</div>
-</section>
-<section id="state-values" class="slide level2 smaller">
-<h2>State values</h2>
-<ul>
-<li>We need a measurement of how valuable being in a specific state is, given a policy.</li>
-<li>Starting from a state <span class="math inline">\(S_t\)</span>, what is the expected return?</li>
-<li>The state value of a state <span class="math inline">\(s\)</span> is defined as</li>
-</ul>
-<p><span class="math display">\[
-v_\pi(s) = E[G_t|S_t = s] = E[R_{t+1} + \gamma R_{t+2} + \dots | S_t = s]
-\]</span></p>
-<div class="fragment">
-<p><img data-src="images/tictactoe.png" width="400"></p>
-<p>It is circle player turn, which state is the most valuable, left of right?</p>
-</div>
-</section>
-<section id="the-bellmans-equation" class="slide level2 smaller incremental">
-<h2>The Bellman’s equation</h2>
-<div class="fragment">
-<p>A recursive equation between the state values</p>
-<p><span class="math display">\[\begin{align}
-v_\pi(s) &amp;= \sum_{a\in\mathcal{A}, r\in\mathcal{R} , s\in\mathcal{S}}\pi(a|s)p(s',r|s,a)(r+\gamma v_\pi(s'))\\
-&amp;= \sum_{a\in\mathcal{A}}\pi(a|s)\sum_{r\in\mathcal{R} , s\in\mathcal{S}}p(s',r|s,a)(r+\gamma v_\pi(s'))\\
-&amp;= \sum_{a\in\mathcal{A}}\pi(a|s)q_\pi(a,s)
-\end{align}\]</span></p>
-<p><span class="math inline">\(q_\pi(a,s)\)</span> is called the action value. Here is the idea:</p>
-</div>
-<div class="fragment">
-<ul>
-<li class="fragment">Compute, with the foremost expression, the state values for a given policy.</li>
-<li class="fragment">Then compute the action values <span class="math inline">\(q_\pi(a,s)\)</span>.</li>
-<li class="fragment">Chose a new policy so that we chose the action with the highest value with probability 1.</li>
-</ul>
-</div>
-<div class="fragment">
-<p>This is called policy iteration.</p>
-</div>
-</section>
-<section id="lets-do-a-step-together" class="slide level2">
-<h2>Let’s do a step together</h2>
-<p>Initial policy is to chose an action among possible actions randomly, and uniformly. The state values are here. What should be the new policy.</p>
-</section>
-<section id="test" class="slide level2">
-<h2>Test</h2>
-<div class="fragment fade-out" data-fragment-index="4">
-<div class="fragment" data-fragment-index="2">
-<p>Appears last</p>
-</div>
-</div>
-<div class="fragment" data-fragment-index="1">
-<p>Appears first</p>
-</div>
-<div class="fragment" data-fragment-index="3">
-<p>Appears second</p>
-</div>
-</section>
-<section id="policy-gradient" class="slide level2">
-<h2>Policy gradient</h2>
-<ul>
-<li>Using policy gradient</li>
-</ul>
-</section>
-<section id="results" class="slide level2">
-<h2>Results</h2>
-</section>
-<section id="what-we-have" class="slide level2">
-<h2>What we have</h2>
-<ul>
-<li>A linear system <span class="math inline">\(Ax = b\)</span></li>
-<li></li>
-</ul>
-</section>
-<section id="going-to-sleep" class="slide level2">
-<h2>Going to sleep</h2>
-<ul>
-<li>Get in bed</li>
-<li>Count sheep</li>
-</ul>
 <div class="footer footer-default">
 
 </div>

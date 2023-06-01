@@ -1,4 +1,4 @@
 - source: presentation.qmd
   quarto-pub:
-    - id: 05c396f6-7887-437b-968e-0a794ed63d44
-      url: 'https://quartopub.com/sites/melanie-inky/reinforcement-learning-is-fun'
+    - id: 0bb0034a-a6f4-4156-9a5d-98527e084a80
+      url: 'https://quartopub.com/sites/melanie-inky/reinforcement-learning-for-the-optimization-of-explicit-runge-kutta-method-parameters'

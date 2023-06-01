@@ -1,5 +1,5 @@
 ---
-title: "Reinforcement learning is fun"
+title: "Reinforcement Learning for the Optimization of Explicit Runge Kutta Method Parameters"
 format:
   revealjs:
     theme: white
@@ -8,46 +8,31 @@ format:
 ---
 
 
-## Intro
+## Introduction and plan
+
+- This bachelor thesis had a lot of small parts pieced together.
+- The goal is to use machine learning in a mathematical setting and discover what is possible to do with it.
+- Focus of this presentation on Reinforcement Learning.
+- Then talk about a test problem for which RL was used.  
 
 
-
-## Motivation behind the thesis - Pseudo time iterations
-
-- We want to solve a linear system $Au = b$ 
-- We consider instead the initial value problem $u'(t) = Au(t)-b$. 
-- In steady state $u' = 0 \iff Au-b = 0$
-- Any consistent numerical solver for this problem converges to the steady state.
-
-
-## Convection diffusion equation
-
-- $u_{xx} = bu_x + 1$, $u(0) = u(1) = 0$.
-- Use finite difference, with $n$ interior nodes to get a linear system of the form $Mu = e$. 
-- Two *problem parameters*, $b$ and $n$.
-- Use an explicit Runge-Kutta solver with one time step parameter $\Delta t$, one other parameter $\alpha$. 
-- How can we choose the best *solver parameters* depending on the *problem parameters*. 
-
-## Machine learning
-
-Machine learning
 
 ## The three main types of machine learning
 
 - Supervised learning. From input $X$, predict output $Y$.
 
-![](images/cat.jpg){width='150'}
+![](images/cat.jpg){width='130'}
 
 Label: cat.
 
 :::{.footer}
-Cat picture credit:© Marie-Lan Nguyen
+Cat picture credit:© Marie-Lan Nguyen. Definitions adapted from *An introduction to statistical learning* by Gareth James, Daniela Witten, Trevor Hastie, Rob Tibshirani.
 :::
 
 
 ## The three main types of machine learning
 - <span style="opacity: 0.5">Supervised learning. From input $X$, predict output $Y$.</span>
-- Unsupervised learning. Use only input $X$ and reveal informations about it.
+- Unsupervised learning. We only have an input $X$ and reveal informations about it.
 
 
 ```{r}
@@ -57,7 +42,7 @@ library(patchwork)
 
 data(iris)
 
-p1 <- iris %>% ggplot(aes(Sepal.Length, Sepal.Width)) +
+p1 <- iris %>% ggplot(aes(Petal.Length, Petal.Width)) +
     geom_point(size = 4) +
     theme_classic() +
     theme(text = element_text(size = 18))
@@ -65,12 +50,12 @@ p1 <- iris %>% ggplot(aes(Sepal.Length, Sepal.Width)) +
 iris_for_cluster <- iris %>% select(-c(Species))
 
 set.seed(123445)
-my_clusters <- kmeans(iris_for_cluster, centers = 3)
+my_clusters <- kmeans(iris_for_cluster, centers = 2)
 
 iris2 <- tibble(cbind(iris, cluster = as.factor(my_clusters$cluster)))
 
 p2 <- iris2  %>%
-    ggplot(aes(x = Sepal.Length, y = Sepal.Width, colour = cluster)) +
+    ggplot(aes(x = Petal.Length, y = Petal.Width, colour = cluster)) +
         geom_point(size = 4) +
         theme_classic() +
         theme(text = element_text(size = 18)) +
@@ -82,14 +67,14 @@ p1 + p2
 ```
 
 :::{.footer}
-An example of k-mean clustering on the Iris dataset, with poor performances. 
+An example of k-mean clustering on the Iris dataset. 
 :::
 
 
 ## The three main types of machine learning
 - <span style="opacity: 0.5">Supervised learning. From input $X$, predict output $Y$.
-- <span style="opacity: 0.5">Unsupervised learning. Use only input $X$ and reveal informations about it.</span>
-- Reinforcement learning. Make decisions and maximize rewards. 
+- <span style="opacity: 0.5">Unsupervised learning. We only have an input $X$ and reveal informations about it.</span>
+- Reinforcement learning. Make decisions and maximize a reward function. 
 
 
 
@@ -98,42 +83,56 @@ An example of k-mean clustering on the Iris dataset, with poor performances.
 
 
 
+In reinforcement learning, an agent interacts with its environment, makes decisions and receives rewards. 
 
-:::{.fragment}
-- In reinforcement learning, an agent interact with its environment, makes a decision and receive rewards. 
-:::
+:::: {.columns}
 
-
-:::{.fragment}
+::: {.column width="60%"}
 ![](images/Pac-man.png)
 :::
 
-
-
-
-## Markov decision process
-
-
-
-:::: {.columns}
-:::{.column width="60%"}
-- A state set $\mathcal{S}$.
-- An action set $\mathcal{A}$.
-- A reward set $\mathcal{R}$.
-- A policy $\pi(a|s)$.
-- A model $p(s',r|s,a)$.
-
+::: {.column width="40%"}
+![](images/Reinforcement_learning_diagram.svg.png)
 :::
 
-:::{.column width="40%"}
-![](images/MDP.png)
-:::
 
 ::::
 
 
-The model has the Markov property. The state and rewards transition probabilities only depend on the current state, and not the states before. 
 
+:::{.footer}
+Pac-man screenshot. Diagram via wikipedia.
+:::
+
+
+## Markov decision process {.smaller}
+
+
+A discrete-time stochastic process with: 
+
+- A state set $\mathcal{S}$.
+- An action set $\mathcal{A}$.
+- A reward set $\mathcal{R}$.
+- A policy $\pi(a|s)$.
+- A model $p(s',r|s,a) = \Pr(S_{t+1} = s', R_{t+1} = r| S_t = s, A_t = a)$.
+
+The model has the Markov property. The states and rewards transition probabilities only depend on the current state, and not the states before.
+
+In other words, the environment is memoryless. 
+
+
+
+
+![](images/Reinforcement_learning_diagram.svg.png){.absolute top="50" width="350" right="30"}
+
+
+
+
+
+
+:::{.footer}
+Diagram via wikipedia. 
+:::
 
 
 ## An adorable example - game rules
@@ -147,7 +146,7 @@ The model has the Markov property. The state and rewards transition probabilitie
 
 ::: {.column width="60%" .incremental .smaller}
 - Jazz the jackrabbit wants to get to the carrot as fast as possible.
-- He can move in any 4 directions, but not diagonally, we call it an action.
+- He can move either vertically or horizontally, but not diagonally.
 - The red boxes are difficult to get into, so he wants to avoid them if possible.
 :::
 
@@ -169,10 +168,10 @@ Example adapted from *Mathematical foundations of reinforcement learning* by Shi
 :::
 
 ::: {.column width="60%" .incremental}
-- We will keep track of Jazz positions over time with his state. 
+- We will keep track of Jazz' position over time with his state. 
 - Starting state $S_0=1$. Subsequent states $S_1,S_2,\dots$. 
-- We also keep track of his actions $A_0, A_1, A_2, \dots$.
-- After each action, he ends up in a new state.
+- Any time he moves is an action. We keep track of his actions $A_0, A_1, A_2, \dots$.
+- After each action, he finds himself in a new state. This is called a state transition.
 - When he ends up on the box with the carrot at a time $\tau$, we stop the process and we call $S_\tau = 9$ the terminal state.
 :::
 
@@ -191,22 +190,11 @@ Example adapted from *Mathematical foundations of reinforcement learning* by Shi
 
 ::: {.column width="60%" .incremental .smaller}
 - How to decide which action to make at which state? We need to define a policy.
-- A policy defines which action Jazz should take, given his current state. Defined as a the conditional probability $\Pr(A_t=a| S_t = s) = \pi(a|s)$.
+- A policy defines which action Jazz should make, given his current state. Defined as a the conditional probability $\Pr(A_t=a| S_t = s) = \pi(a|s)$.
 :::
 
 ::::
 
-## An adorable example - State transitions {.smaller}
-
-
-![](images/state_transition.png)
-
-:::{.incremental}
-- In this example, at time $t$, Jazz' state is $S_t=4$.
-- He looks at his policy $\pi(a|s=4)$, which tells him to go right with probability 1. 
-- He takes the action $A_t=\text{right}$, and Jazz finds himself in a new state $S_{t+1} = 5$.
-- This is called a state transition.
-:::
 
 ## An adorable example - Rewards
 
@@ -218,43 +206,15 @@ Example adapted from *Mathematical foundations of reinforcement learning* by Shi
 :::
 
 ::: {.column width="60%" .incremental .smaller}
+- Rewards should be designed to encourage getting to the carrot as fast as possible, and to avoid red boxes.  
 - Depending on his state $S_t$ and the chosen action $A_t$ Jazz gets a reward $R_{t+1}$.
-- Rewards can be stochastics as well. 
-
 :::
 
 ::::
-
-
-## Stochastic states and rewards transition {.smaller}
-
-
-:::{.fragment}
-:::: {.columns}
-
-::: {.column width="35%"}
-![](images/bunny_teleporter.png)
-:::
-
-::: {.column width="65%" .incremental .smaller}
-- There is now a teleporter in the 4th box. 
-- $\Pr(S_{t+1} = 9, R_{t+1} = 5,  | S_t = 1, A_t = \text{"down"}) = 0.5$.
-- $\Pr(S_{t+1} = 7,  R_{t+1} = -1| S_t = 1, A_t = \text{"down"}) = 0.5$.
-- More generally, we denote this by $p(r,s'|a,s)$.
-- Is going down a good decision from this state?
-:::
-
-::::
-:::
-
-:::{.fragment}
-This is what we will call the model. Can be difficult to know in advance. Imagine for example if the teleporter chances are unknown.
-:::
-
 
 ## An adorable example - Trajectory {.smaller}
 
-:::{.fragment}
+
 :::: {.columns}
 
 ::: {.column width="40%"}
@@ -264,20 +224,19 @@ This is what we will call the model. Can be difficult to know in advance. Imagin
 ::: {.column width="60%" .incremental .smaller}
 - A trajectory is the chain of states, actions and rewards $S_0, A_0 \to S_1, A_1, R_1 \to \dots \to S_\tau ,A_\tau , R_\tau$.
 - A return is then $G_0 = R_1 + \gamma R_2 + \gamma^2 R_3 + \dots + \gamma^{\tau-1} R_\tau$ where $\gamma$ is called the discount rate.
-- The discount rate is between 0 and 1, and indicates how we should value long term rewards vs short term rewards.
+- The discount rate is between 0 and 1, and is there to balance long term vs short term rewards.
 :::
 
 ::::
-:::
 
 :::{.fragment}
-Jazz's goal is to find a policy that maximizes his return.
+Jazz's goal is to find a policy that maximizes the return he gets.
 :::
 
 ## State values {.smaller}
 
 
-- We need a measurement of how valuable being in a specific state is, given a policy. 
+- We need a criterion for how valuable being in a specific state is, given a policy. 
 - Starting from a state $S_t$, what is the expected return?
 - The state value of a state $s$ is defined as 
 
@@ -291,11 +250,14 @@ $$
 It is circle player turn, which state is the most valuable, left of right?
 :::
 
+:::{.fragment}
+It depends on the policy. If the policy is good then left state is more valuable.
+:::
 
-## The Bellman's equation {.smaller .incremental}
+
+## The Bellman equation {.smaller .incremental}
 
 :::{.fragment}
-A recursive equation between the state values
 
 \begin{align}
 v_\pi(s) &= \sum_{a\in\mathcal{A}, r\in\mathcal{R} , s\in\mathcal{S}}\pi(a|s)p(s',r|s,a)(r+\gamma v_\pi(s'))\\
@@ -303,57 +265,188 @@ v_\pi(s) &= \sum_{a\in\mathcal{A}, r\in\mathcal{R} , s\in\mathcal{S}}\pi(a|s)p(s
 &= \sum_{a\in\mathcal{A}}\pi(a|s)q_\pi(a,s)
 \end{align}
 
-$q_\pi(a,s)$ is called the action value. Here is the idea:
+$q_\pi(a,s)$ is called the action value. Idea:
 :::
 
 :::{.fragment .incremental}
-- Compute, with the foremost expression, the state values for a given policy.
-- Then compute the action values $q_\pi(a,s)$.
-- Chose a new policy so that we chose the action with the highest value with probability 1. 
+1. Compute, with the foremost expression, the state values for a given policy.
+2. Then compute the action values $q_\pi(a,s)$.
+3. Chose a new policy so that we chose the best action.
 :::
 
 :::{.fragment}
 This is called policy iteration.
 :::
 
-
-## Let's do a step together
-
-Initial policy is to chose an action among possible actions randomly, and uniformly. 
-The state values are here.
-What should be the new policy. 
-
-
-## Test
-
-::: {.fragment fragment-index=4 .fade-out}
-::: {.fragment fragment-index=2}
-Appears last
-:::
+:::{.footer}
+The general idea is called *generalized policy iteration* in *Reinforcement learning - An introduction* by Richard S. Sutton and Andrew G. Barto. 
 :::
 
-::: {.fragment fragment-index=1}
-Appears first
+
+
+## Motivation behind the thesis - Pseudo time iterations
+
+- We want to solve a linear system $Au = b$ 
+- We consider instead the initial value problem $u'(t) = Au(t)-b$. 
+- In steady state $u' = 0 \iff Au-b = 0$
+- Any consistent numerical solver for this problem converges to the steady state.
+
+
+## Convection diffusion equation {.smaller}
+
+:::{.incremental}
+- $u_{xx} = bu_x + 1$, $u(0) = u(1) = 0$.
+- Use finite difference, with $n$ interior nodes to get a linear system of the form $Mu = e$. 
+- Solve the linear system by solving the IVP $u' = e - Mu$.
+- Two *problem parameters*, $b$ and $n$.
+- Use an explicit Runge-Kutta solver with one time step parameter $\Delta t$, one other parameter $\alpha$. 
+- How to choose the best *solver parameters* depending on the *problem parameters*? 
 :::
 
-::: {.fragment fragment-index=3}
-Appears second
+
+## Making the test problem a reinforcement learning problem{.smaller}
+
+:::{.incremental}
+- Two *problem parameters* $b$ and $n$. We model this as a state.
+- An action is choosing a set of *solver parameters* $\alpha$ and $\Delta t$. 
+- State transitions are random, choose a new $b$ and $n$ after taking an action.  
+- Then, we choose the policy to be of the form 
 :::
 
-## Policy gradient
+:::{.fragment}
+$$
+\begin{pmatrix}
+\alpha \\
+\Delta t
+\end{pmatrix} = 
+\begin{pmatrix}
+\theta_0 & \theta_1\\
+\theta_2 & \theta_3
+\end{pmatrix} 
+\begin{pmatrix}
+b\\
+n
+\end{pmatrix} +
+\begin{pmatrix}
+\theta_4\\
+\theta_5
+\end{pmatrix}.
+$$
 
-- Using policy gradient 
+Goal: find the best possible values for the $\theta_i$. We need to define a reward to maximize!
+:::
+
+## Reward {.smaller}
+
+:::{.incremental}
+- Once both the state ($b$ and $n$) and the action ($\Delta t$ and $\alpha$) are chosen, we need to compute a reward.
+- Ideally, rewards should be dependent on convergence rate of the solver, but this is computationally expensive to do.
+- Define the residual after $k$ iterations as $r_k = ||Mu^{k} - e||$. Then define the residual ratio 
+:::
+
+:::{.fragment}
+$$
+\rho_k = \frac{r_k}{r_{k-1}} = \frac{||Mu^{k} - e||}{||Mu^{k-1} - e||}.
+$$
+
+Then the reward can be $r = 1-\rho_{10}$. 
+:::
 
 
-## Results
+
+## Results {.smaller}
 
 
-## What we have
+$$
+\begin{pmatrix}
+\alpha \\
+\Delta t
+\end{pmatrix} = 
+\begin{pmatrix}
+\theta_0 & \theta_1\\
+\theta_2 & \theta_3
+\end{pmatrix} 
+\begin{pmatrix}
+b\\
+n
+\end{pmatrix} +
+\begin{pmatrix}
+\theta_4\\
+\theta_5
+\end{pmatrix}.
+$$
+Initial value for $\theta$ was chosen as $\theta_4 = 0.3$, $\theta_5 = 2$. Rest to $0$. Evolution of the parameters:
 
-- A linear system $Ax = b$
-- 
+![](images/theta_evol.png)
 
-## Going to sleep
+## Before and after training
 
-- Get in bed
-- Count sheep
+
+
+![](images/initial_policy_10.png){.absolute left='10' width="500"}
+
+
+![](images/learned_policy_10.png){.absolute left='510' top='70' width="500"}
+
+
+
+
+## Conclusion
+
+- A use of machine learning in a numerical analysis setting.
+- Reinforcement learning can be used.
+- Could be extended to choosing which solver to use, and for more equations.
+
+
+## Bonus slides
+
+
+
+
+
+## Machine learning
+
+"Machine learning (ML) is a field devoted to understanding and building methods that let machines  \"learn" – that is, methods that leverage data to improve computer performance on some set of tasks."
+
+
+:::{.footer}
+Via wikipedia, which cites *Machine learning* (1997) by Mitchel, Tom. 
+:::
+
+## An adorable example - Example {.smaller}
+
+
+![](images/state_transition.png)
+
+:::{.incremental}
+- In this example, at time $t$, Jazz' state is $S_t=4$.
+- He looks at his policy $\pi(a|s=4)$, which tells him to go right with probability 1. 
+- He takes the action $A_t=\text{right}$, and Jazz finds himself in a new state $S_{t+1} = 5$.
+:::
+
+
+
+## Stochastic states and rewards transition {.smaller}
+
+
+:::{.fragment}
+:::: {.columns}
+
+::: {.column width="30%"}
+![](images/bunny_teleporter.png)
+:::
+
+::: {.column width="70%" .incremental .smaller}
+- There is now a teleporter in the 4th box. 
+- $\Pr(S_{t+1} = 9, R_{t+1} = 5,  | S_t = 1, A_t = \text{"down"}) = 0.5$.
+- $\Pr(S_{t+1} = 7,  R_{t+1} = -1| S_t = 1, A_t = \text{"down"}) = 0.5$.
+- More generally, we denote this by $p(r,s'|a,s)$.
+- Is going down a good decision from this state?
+:::
+
+::::
+:::
+
+:::{.fragment}
+This is what we will call the model. Can be difficult to know in advance. Imagine for example if the teleporter chances are unknown.
+:::
